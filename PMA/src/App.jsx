@@ -8,7 +8,8 @@ function App() {
   const [projectState, setProjectState] = useState(
     {
       selectedProjectId: undefined, // nothing is selected
-      projects: []
+      projects: [],
+      tasks : []
     }
   );
 
@@ -58,18 +59,47 @@ function App() {
   }
 
   const handleDeleteProject = () => {
-    const newProjects = projectState.projects.filter(project => project.id!== selectedProject.id);
+    const newProjects = projectState.projects.filter(project => project.id !== selectedProject.id);
     setSelectedProject(null);
     setProjectState(prevState => {
       return {
         ...prevState,
         selectedProjectId: undefined,
-         projects: newProjects
+        projects: newProjects
       }
     })
   }
 
-  let content = <SelectedProject project={selectedProject} onDeleteingProject={handleDeleteProject}/>;
+  const handleAddTask = (task) => {
+    setProjectState(prevState => {
+      const newTask = {
+        task : task,
+        id: Number(Math.random() * 1000) + new Date(),
+        projectId : selectedProject.id
+      };
+      return {
+        ...prevState,
+        tasks: [...prevState.tasks, newTask]
+      }
+    })
+  }
+
+  const handleDeleteTask = (id) => {
+    setProjectState(prevState => {
+      return {
+        ...prevState,
+        tasks: prevState.tasks.filter(item => item.id !== id)
+      }
+    })
+  }
+
+  let content = <SelectedProject
+    project={selectedProject}
+    onDeleteingProject={handleDeleteProject}
+    handleAddTask={handleAddTask}
+    handleDeleteTask={handleDeleteTask}
+    tasks={projectState.tasks.filter(item=> item.projectId === selectedProject.id)}
+  />;
 
   if (projectState.selectedProjectId === null) {
     content = <NewProject onAddingNewProject={addProject} cancelProject={cancelProject} />;
